@@ -104,6 +104,29 @@ def format_datetime(value, format='medium'):
 
 app.jinja_env.filters['datetime'] = format_datetime
 
+def count_upcomming_shows(shows: list[Show], refDate = datetime.now()):
+  upcomming_show = 0
+  for show in shows:
+    print(show.start_time)
+    show_start_time: datetime
+    show_start_time = show.start_time
+    if show_start_time.strftime('%Y-%m-%d %H:%M:%S') >= refDate.strftime('%Y-%m-%d %H:%M:%S'):
+      upcomming_show += 1
+
+  return upcomming_show
+
+def get_area_from_venue(v: Venue):
+  area = {
+    'city': v.city,
+    'state': v.state,
+    'venues':[{
+      'id': v.id,
+      'name': v.name,
+      'num_upcoming_shows': count_upcomming_shows(v.shows)
+    }]
+  }
+  return area
+
 #----------------------------------------------------------------------------#
 # Controllers.
 #----------------------------------------------------------------------------#
@@ -118,30 +141,24 @@ def index():
 
 @app.route('/venues')
 def venues():
-  # TODO: replace with real venues data.
-  #       num_upcoming_shows should be aggregated based on number of upcoming shows per venue.
-  data=[{
-    "city": "San Francisco",
-    "state": "CA",
-    "venues": [{
-      "id": 1,
-      "name": "The Musical Hop",
-      "num_upcoming_shows": 0,
-    }, {
-      "id": 3,
-      "name": "Park Square Live Music & Coffee",
-      "num_upcoming_shows": 1,
-    }]
-  }, {
-    "city": "New York",
-    "state": "NY",
-    "venues": [{
-      "id": 2,
-      "name": "The Dueling Pianos Bar",
-      "num_upcoming_shows": 0,
-    }]
-  }]
-  return render_template('pages/venues.html', areas=data);
+  venues = Venue.query.all()
+  areasDic = [get_area_from_venue(venues[0])]
+  for i in range(1, len(venues)):
+    areaExited = False
+    for area in areasDic:
+      if area.get('city') == venues[i].city and area.get('state') == venues[i].state:
+        areaExited = True
+        break
+
+    if areaExited == False:
+      areasDic.append(get_area_from_venue(venues[i]))
+    else:
+      area['venues'].append({
+        'id': venues[i].id,
+        'name': venues[i].name,
+        'num_upcoming_shows': count_upcomming_shows(venues[i].shows)
+      })
+  return render_template('pages/venues.html', areas=areasDic)
 
 @app.route('/venues/search', methods=['POST'])
 def search_venues():
