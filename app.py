@@ -360,7 +360,7 @@ def edit_artist(artist_id):
   data = artist.__dict__
   data['website_link'] = artist.website
   data['genres'] = artist.genres.split(',')
-  form = ArtistForm(formdata = request.form, data=data)
+  form = ArtistForm(formdata = None, data=data)
   return render_template('forms/edit_artist.html', form=form, artist=data)
 
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
@@ -399,7 +399,7 @@ def edit_venue(venue_id):
   data = venue.__dict__
   data['website_link'] = venue.website
   data['genres'] = venue.genres.split(',')
-  form = VenueForm(formdata = request.form, data=data)
+  form = VenueForm(formdata = None, data=data)
   return render_template('forms/edit_venue.html', form=form, venue=data)
 
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
