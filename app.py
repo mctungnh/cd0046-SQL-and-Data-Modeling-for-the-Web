@@ -122,7 +122,7 @@ def format_datetime(value, format='medium'):
 
 app.jinja_env.filters['datetime'] = format_datetime
 
-def specify_shows(shows: list[Show], compare_operator = ">=", refDate = datetime.now()):
+def specify_shows(shows, compare_operator = ">=", refDate = datetime.now()):
   output_shows = []
 
   if compare_operator != "<" and compare_operator != ">=":
