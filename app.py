@@ -250,24 +250,28 @@ def create_venue_submission():
   error = False
   errorMsg = ""
   form = VenueForm(request.form, meta={'csrf': False})
-  try:
-    venue = Venue()
-    venue.update(request.form)
-    exists = db.session.query(Venue.query.filter(Venue.name == venue.name).exists()).scalar()
-    if exists:
-      errorMsg = "Venue's existed already!"
-      error = False
-      raise Exception(errorMsg)
+  if not form.validate:
+    errormsg = "Form data is error"
+    error = True
+  else:
+    try:
+      venue = Venue()
+      venue.update(request.form)
+      exists = db.session.query(Venue.query.filter(Venue.name == venue.name).exists()).scalar()
+      if exists:
+        errorMsg = "Venue's existed already!"
+        error = False
+        raise Exception(errorMsg)
 
-    venue.id = db.session.query(func.max(Venue.id)).scalar() + 1
-    db.session.add(venue)
-    db.session.commit()
-  except:
-      db.session.rollback()
-      error = True
-      print(sys.exc_info())
-  finally:
-      db.session.close()
+      venue.id = db.session.query(func.max(Venue.id)).scalar() + 1
+      db.session.add(venue)
+      db.session.commit()
+    except:
+        db.session.rollback()
+        error = True
+        print(sys.exc_info())
+    finally:
+        db.session.close()
 
   if not error:
     # on successful db insert, flash success
@@ -362,24 +366,29 @@ def edit_artist(artist_id):
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
   error = False
+  errormsg = ""
   form = ArtistForm()
-  try:
-    artist = Artist.query.get(artist_id)
-    artist.update(request.form)
-    db.session.add(artist)
-    db.session.commit()
-  except:
-      db.session.rollback()
-      error = True
-      print(sys.exc_info())
-  finally:
-      db.session.close()
+  if not form.validate:
+    errormsg = "Form data is error"
+    error = True
+  else:
+    try:
+      artist = Artist.query.get(artist_id)
+      artist.update(request.form)
+      db.session.add(artist)
+      db.session.commit()
+    except:
+        db.session.rollback()
+        error = True
+        print(sys.exc_info())
+    finally:
+        db.session.close()
 
   if not error:
     # on successful db insert, flash success
     flash('Artist ' + request.form['name'] + ' was successfully editted!')
   else:
-    flash('An error occurred. Artist '  + request.form['name'] + ' could not be liedittedsted.')
+    flash('An error occurred. Artist '  + request.form['name'] + ' could not be liedittedsted. ' + errormsg)
 
 
   return redirect(url_for('show_artist', artist_id=artist_id))
@@ -396,25 +405,30 @@ def edit_venue(venue_id):
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
   error = False
-  form = VenueForm(request.form, meta={'csrf': False})
-  try:
-    venue = Venue.query.get(venue_id)
-    venue.update(request.form)
+  errormsg = ""
+  form = VenueForm(request.form, meta = {'csrf': False})
+  if not form.validate:
+    errormsg = "Form data is error"
+    error = True
+  else:
+    try:
+      venue = Venue.query.get(venue_id)
+      venue.update(request.form)
 
-    db.session.add(venue)
-    db.session.commit()
-  except:
-      db.session.rollback()
-      error = True
-      print(sys.exc_info())
-  finally:
-      db.session.close()
+      db.session.add(venue)
+      db.session.commit()
+    except:
+        db.session.rollback()
+        error = True
+        print(sys.exc_info())
+    finally:
+        db.session.close()
 
   if not error:
     # on successful db insert, flash success
     flash('Venue ' + request.form['name'] + ' was successfully edited!')
   else:
-    flash('An error occurred. Venue'  + request.form['name'] + ' could not be edited.')
+    flash('An error occurred. Venue'  + request.form['name'] + ' could not be edited. ' + errormsg)
 
   return redirect(url_for('show_venue', venue_id=venue_id))
 
@@ -430,25 +444,29 @@ def create_artist_form():
 def create_artist_submission():
   error = False
   errorMsg = ""
-  form = ArtistForm()
-  try:
-    artist = Artist()
-    artist.update(request.form)
-    exists = db.session.query(Artist.query.filter(Artist.name == artist.name).exists()).scalar()
-    if exists:
-      errorMsg = "Artist's existed already!"
-      error = False
-      raise Exception(errorMsg)
+  form = ArtistForm() 
+  if not form.validate:
+    errormsg = "Form data is error"
+    error = True
+  else:
+    try:
+      artist = Artist()
+      artist.update(request.form)
+      exists = db.session.query(Artist.query.filter(Artist.name == artist.name).exists()).scalar()
+      if exists:
+        errorMsg = "Artist's existed already!"
+        error = False
+        raise Exception(errorMsg)
 
-    artist.id = db.session.query(func.max(Artist.id)).scalar() + 1
-    db.session.add(artist)
-    db.session.commit()
-  except:
-      db.session.rollback()
-      error = True
-      print(sys.exc_info())
-  finally:
-      db.session.close()
+      artist.id = db.session.query(func.max(Artist.id)).scalar() + 1
+      db.session.add(artist)
+      db.session.commit()
+    except:
+        db.session.rollback()
+        error = True
+        print(sys.exc_info())
+    finally:
+        db.session.close()
 
   if not error:
     # on successful db insert, flash success
