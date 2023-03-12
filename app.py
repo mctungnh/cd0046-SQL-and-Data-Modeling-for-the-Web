@@ -250,8 +250,8 @@ def create_venue_submission():
   error = False
   errorMsg = ""
   form = VenueForm(request.form, meta={'csrf': False})
-  if not form.validate:
-    errormsg = "Form data is error"
+  if not form.validate():
+    errormsg = "Form format error."
     error = True
   else:
     try:
@@ -277,7 +277,7 @@ def create_venue_submission():
     # on successful db insert, flash success
     flash('Venue ' + request.form['name'] + ' was successfully listed!')
   else:
-    flash('An error occurred. Venue'  + request.form['name'] + ' could not be listed. ' + errorMsg)
+    flash('An error occurred. Venue'  + request.form['name'] + ' could not be listed. ' + errormsg)
 
   return render_template('pages/home.html')
 
@@ -367,9 +367,9 @@ def edit_artist(artist_id):
 def edit_artist_submission(artist_id):
   error = False
   errormsg = ""
-  form = ArtistForm()
-  if not form.validate:
-    errormsg = "Form data is error"
+  form = ArtistForm(request.form, meta={'csrf': False})
+  if not form.validate():
+    errormsg = "Form format error."
     error = True
   else:
     try:
@@ -406,9 +406,9 @@ def edit_venue(venue_id):
 def edit_venue_submission(venue_id):
   error = False
   errormsg = ""
-  form = VenueForm(request.form, meta = {'csrf': False})
-  if not form.validate:
-    errormsg = "Form data is error"
+  form = VenueForm(request.form, meta={'csrf': False})
+  if not form.validate():
+    errormsg = "Form format error."
     error = True
   else:
     try:
@@ -444,9 +444,9 @@ def create_artist_form():
 def create_artist_submission():
   error = False
   errorMsg = ""
-  form = ArtistForm() 
-  if not form.validate:
-    errormsg = "Form data is error"
+  form = ArtistForm(request.form, meta={'csrf': False})
+  if not form.validate():
+    errorMsg = "Form format error."
     error = True
   else:
     try:
