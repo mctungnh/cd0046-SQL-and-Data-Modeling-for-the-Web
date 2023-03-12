@@ -52,6 +52,14 @@ class Venue(db.Model):
     seeking_description = db.Column(db.String(1000))
     shows = db.relationship('Show', backref='venue', lazy=True)
 
+    def update(self, d = None):
+          if d is not None:
+            genres = request.form.getlist('genres')
+            self.genres = ','.join(genres)
+            for key, value in d.items():
+              if key != "genres":
+                setattr(self, key, value)
+  
     def __repr__(self):
       return f'<Venue ID: {self.id}, name: {self.name}, city: {self.city}>, state: {self.state}>,\
               address: {self.address}>, phone: {self.phone}>, image_link: {self.image_link}>,    \
@@ -74,6 +82,14 @@ class Artist(db.Model):
     seeking_venue = db.Column(db.Boolean)
     seeking_description = db.Column(db.String(1000))
     shows = db.relationship('Show', backref='artist', lazy=True)
+
+    def update(self, d = None):
+          if d is not None:
+            genres = request.form.getlist('genres')
+            self.genres = ','.join(genres)
+            for key, value in d.items():
+              if key != "genres":
+                setattr(self, key, value)
 
     def __repr__(self):
       return f'<Artist ID: {self.id}, name: {self.name}, city: {self.city}>,                     \
@@ -236,19 +252,7 @@ def create_venue_submission():
   form = VenueForm(request.form, meta={'csrf': False})
   try:
     venue = Venue()
-    venue.name = form.name.data
-    venue.city = form.city.data
-    venue.state = form.state.data
-    venue.address = form.address.data
-    venue.phone = form.phone.data
-    genres = request.form.getlist('genres')
-    venue.genres = ','.join(genres)
-    venue.facebook_link = form.facebook_link.data
-    venue.website = form.website_link.data
-    venue.image_link = form.image_link.data
-    venue.seeking_talent = form.seeking_talent.data
-    venue.seeking_description = form.seeking_description.data
-
+    venue.update(request.form)
     exists = db.session.query(Venue.query.filter(Venue.name == venue.name).exists()).scalar()
     if exists:
       errorMsg = "Venue's existed already!"
@@ -361,17 +365,7 @@ def edit_artist_submission(artist_id):
   form = ArtistForm()
   try:
     artist = Artist.query.get(artist_id)
-    artist.name = form.name.data
-    artist.city = form.city.data
-    artist.state = form.state.data
-    artist.phone = form.phone.data
-    genres = request.form.getlist('genres')
-    artist.genres = ','.join(genres)
-    artist.facebook_link = form.facebook_link.data
-    artist.website = form.website_link.data
-    artist.image_link = form.image_link.data
-    artist.seeking_venue = form.seeking_venue.data
-    artist.seeking_description = form.seeking_description.data
+    artist.update(request.form)
     db.session.add(artist)
     db.session.commit()
   except:
@@ -405,18 +399,7 @@ def edit_venue_submission(venue_id):
   form = VenueForm(request.form, meta={'csrf': False})
   try:
     venue = Venue.query.get(venue_id)
-    venue.name = form.name.data
-    venue.city = form.city.data
-    venue.state = form.state.data
-    venue.address = form.address.data
-    venue.phone = form.phone.data
-    genres = request.form.getlist('genres')
-    venue.genres = ','.join(genres)
-    venue.facebook_link = form.facebook_link.data
-    venue.website = form.website_link.data
-    venue.image_link = form.image_link.data
-    venue.seeking_talent = form.seeking_talent.data
-    venue.seeking_description = form.seeking_description.data
+    venue.update(request.form)
 
     db.session.add(venue)
     db.session.commit()
@@ -450,17 +433,7 @@ def create_artist_submission():
   form = ArtistForm()
   try:
     artist = Artist()
-    artist.name = form.name.data
-    artist.city = form.city.data
-    artist.state = form.state.data
-    artist.phone = form.phone.data
-    genres = request.form.getlist('genres')
-    artist.genres = ','.join(genres)
-    artist.facebook_link = form.facebook_link.data
-    artist.website = form.website_link.data
-    artist.image_link = form.image_link.data
-    artist.seeking_venue = form.seeking_venue.data
-    artist.seeking_description = form.seeking_description.data
+    artist.update(request.form)
     exists = db.session.query(Artist.query.filter(Artist.name == artist.name).exists()).scalar()
     if exists:
       errorMsg = "Artist's existed already!"
